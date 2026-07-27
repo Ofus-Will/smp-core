@@ -2,8 +2,6 @@
 
 A small core plugin for a Minecraft survival multiplayer server.
 
-`smp-core` bundles the quality-of-life features I want on my SMP into one Paper plugin: homes, graves, pets, item tools, holograms, storage helpers, and small world interactions.
-
 ## Features
 
 ### Homes
