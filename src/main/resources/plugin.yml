@@ -1,0 +1,5 @@
+name: Core
+version: 1.0
+main: org.ofus.core.Core
+api-version: '26.2'
+author: Ofus

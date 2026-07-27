@@ -1,0 +1,16 @@
+features:
+  homes: true
+  graves: true
+  chest-sort: true
+  quick-stack: true
+  pets: true
+
+homes:
+  max: 5
+
+quick-stack:
+  radius: 5
+
+items:
+  max-rename-length: 64
+  max-lore-line-length: 128
