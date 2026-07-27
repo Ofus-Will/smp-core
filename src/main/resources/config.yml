@@ -1,6 +1,8 @@
 features:
   homes: true
   graves: true
+  holograms: true
+  damage-holograms: true
   chest-sort: true
   quick-stack: true
   pets: true

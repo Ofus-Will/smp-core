@@ -1,6 +1,7 @@
 package org.ofus.core.util;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 public final class LocationUtils {
 
@@ -14,5 +15,9 @@ public final class LocationUtils {
                 location.getBlockY(),
                 location.getBlockZ()
         );
+    }
+
+    public static Location getHeadLocation(Player player) {
+        return player.getEyeLocation().add(player.getLocation().getDirection().normalize().multiply(1.5));
     }
 }

@@ -7,7 +7,9 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.ofus.core.feature.PluginFeature;
 import org.ofus.core.feature.chestsort.ChestSortFeature;
+import org.ofus.core.feature.damage.DamageHologramListener;
 import org.ofus.core.feature.grave.GraveFeature;
+import org.ofus.core.feature.hologram.HologramFeature;
 import org.ofus.core.feature.home.HomeFeature;
 import org.ofus.core.feature.item.LoreCommand;
 import org.ofus.core.feature.item.RenameCommand;
@@ -29,6 +31,8 @@ public class Core extends JavaPlugin {
     private final List<PluginFeature> features = new ArrayList<>();
     private final List<RootCommand> commands = new ArrayList<>();
 
+    private DamageHologramListener damageHologramListener;
+
     @Override
     public void onEnable() {
         getLogger().info("Plugin enabled!");
@@ -45,6 +49,7 @@ public class Core extends JavaPlugin {
         getLogger().info("Plugin disabled!");
 
         features.forEach(PluginFeature::disable);
+        if (damageHologramListener != null) damageHologramListener.removeAll();
     }
 
     private void createFeatures() {
@@ -52,23 +57,26 @@ public class Core extends JavaPlugin {
 
         if (settings.homesEnabled()) features.add(new HomeFeature(this, settings));
         if (settings.gravesEnabled()) features.add(new GraveFeature(this));
+        if (settings.hologramsEnabled()) features.add(new HologramFeature(this));
+        if (settings.damageHologramsEnabled()) damageHologramListener = new DamageHologramListener(this);
         if (settings.chestSortEnabled()) features.add(new ChestSortFeature());
         if (settings.quickStackEnabled()) commands.add(new QuickStackCommand(settings.quickStackRadius()));
         if (settings.petsEnabled()) features.add(new PetsFeature(this));
         if (settings.recipesEnabled()) features.add(new RecipeFeature(this));
 
         commands.addAll(List.of(
-            new RenameCommand(settings.maxRenameLength()),
-            new LoreCommand(settings.maxLoreLineLength()),
-            new WorldCommand(),
-            new SpawnCommand(),
-            new CreativeCommand(),
-            new SurvivalCommand()
+                new RenameCommand(settings.maxRenameLength()),
+                new LoreCommand(settings.maxLoreLineLength()),
+                new WorldCommand(),
+                new SpawnCommand(),
+                new CreativeCommand(),
+                new SurvivalCommand()
         ));
     }
 
     private void registerListeners() {
         registerListenerBatch(new GUIListener());
+        if (damageHologramListener != null) registerListenerBatch(damageHologramListener);
 
         for (PluginFeature feature : features) {
             registerListenerBatch(feature.listeners().toArray(Listener[]::new));
@@ -77,15 +85,15 @@ public class Core extends JavaPlugin {
 
     private void registerCommands() {
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS,
-            event -> {
-                List<RootCommand> registeredCommands = new ArrayList<>(commands);
+                event -> {
+                    List<RootCommand> registeredCommands = new ArrayList<>(commands);
 
-                for (PluginFeature feature : features) {
-                    registeredCommands.addAll(feature.commands());
-                }
+                    for (PluginFeature feature : features) {
+                        registeredCommands.addAll(feature.commands());
+                    }
 
-                registerCommandBatch(event.registrar(), registeredCommands.toArray(RootCommand[]::new));
-            });
+                    registerCommandBatch(event.registrar(), registeredCommands.toArray(RootCommand[]::new));
+                });
     }
 
     private void registerPermission(String node, PermissionDefault defaultValue) {

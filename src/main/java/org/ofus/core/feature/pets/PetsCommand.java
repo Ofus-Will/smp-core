@@ -16,6 +16,7 @@ public class PetsCommand extends PlayerCommand {
         this.petManager = petManager;
 
         usage("/pets");
+        aliases("pet");
         permission("core.pets", PermissionDefault.TRUE);
         description("Open a list of your pets");
     }

@@ -36,8 +36,8 @@ public class PetsGUI extends GUI {
         meta.lore(List.of(
                 Texts.parse("&fLast seen: &a" + LocationUtils.format(pet.location())),
                 Texts.parse(""),
-                Texts.parse("&8Left click to teleport to pet"),
-                Texts.parse("&8Right click to teleport pet to you")
+                Texts.parse("&8⇒ &7Left click to teleport to"),
+                Texts.parse("&8⇒ &7Right click to teleport to you")
         ));
 
         icon.setItemMeta(meta);
@@ -60,30 +60,19 @@ public class PetsGUI extends GUI {
     private void teleportPlayerToPet(Player player, PetData pet) {
         player.closeInventory();
 
-        PetManager.TeleportResult result = petManager.teleportPlayerToPet(player, pet.id());
-        if (result == PetManager.TeleportResult.SUCCESS) {
+        if (petManager.teleportPlayerToPet(player, pet.id())) {
             Texts.send(player, "&aTeleported to your " + formatType(pet.type()));
             return;
         }
 
-        sendFailure(player, result);
+        Texts.send(player, "&cCould not teleport to that pet");
     }
 
     private void teleportPetToPlayer(Player player, PetData pet) {
         player.closeInventory();
 
-        PetManager.TeleportResult result = petManager.teleportToPlayer(player, pet.id());
-        if (result == PetManager.TeleportResult.SUCCESS) {
+        if (petManager.teleportToPlayer(player, pet.id())) {
             Texts.send(player, "&aTeleported your " + formatType(pet.type()) + " to you");
-            return;
-        }
-
-        sendFailure(player, result);
-    }
-
-    private static void sendFailure(Player player, PetManager.TeleportResult result) {
-        if (result == PetManager.TeleportResult.NOT_FOUND) {
-            Texts.send(player, "&cThat pet could not be found. Try visiting where it was last seen.");
             return;
         }
 

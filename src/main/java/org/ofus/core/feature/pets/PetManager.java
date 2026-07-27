@@ -1,5 +1,6 @@
 package org.ofus.core.feature.pets;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -30,7 +31,7 @@ public class PetManager {
             pets.put(pet.id(), pet);
         }
 
-        for (Tameable pet : PetFinder.findPets(owner)) {
+        for (Tameable pet : findPets(owner)) {
             PetData data = save(pet);
             pets.put(data.id(), data);
         }
@@ -52,30 +53,22 @@ public class PetManager {
         return data;
     }
 
-    public TeleportResult teleportToPlayer(Player player, UUID petId) {
+    public boolean teleportToPlayer(Player player, UUID petId) {
         Tameable pet = getPet(player, petId);
-        if (pet == null) return TeleportResult.NOT_FOUND;
-
-        if (pet instanceof Sittable sittable) {
-            sittable.setSitting(false);
-        }
-
-        boolean teleported = pet.teleport(player.getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-        if (!teleported) return TeleportResult.FAILED;
+        if (pet == null) return false;
+        if (!pet.teleport(player.getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN)) return false;
 
         save(pet);
-        return TeleportResult.SUCCESS;
+        return true;
     }
 
-    public TeleportResult teleportPlayerToPet(Player player, UUID petId) {
+    public boolean teleportPlayerToPet(Player player, UUID petId) {
         Tameable pet = getPet(player, petId);
-        if (pet == null) return TeleportResult.NOT_FOUND;
-
-        boolean teleported = player.teleport(pet, PlayerTeleportEvent.TeleportCause.PLUGIN);
-        if (!teleported) return TeleportResult.FAILED;
+        if (pet == null) return false;
+        if (!player.teleport(pet, PlayerTeleportEvent.TeleportCause.PLUGIN)) return false;
 
         save(pet);
-        return TeleportResult.SUCCESS;
+        return true;
     }
 
     private Tameable getPet(Player player, UUID petId) {
@@ -115,9 +108,16 @@ public class PetManager {
         return null;
     }
 
-    public enum TeleportResult {
-        SUCCESS,
-        NOT_FOUND,
-        FAILED
+    public static List<Tameable> findPets(Player player) {
+        return findPets(player.getUniqueId());
+    }
+
+    public static List<Tameable> findPets(UUID owner) {
+        return Bukkit.getWorlds().stream()
+                .flatMap(world -> world.getEntitiesByClass(Tameable.class).stream())
+                .filter(Tameable::isTamed)
+                .filter(pet -> owner.equals(pet.getOwnerUniqueId()))
+                .sorted(Comparator.comparing(pet -> pet.getType().name()))
+                .toList();
     }
 }

@@ -6,6 +6,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 public record Settings(
         boolean homesEnabled,
         boolean gravesEnabled,
+        boolean hologramsEnabled,
+        boolean damageHologramsEnabled,
         boolean chestSortEnabled,
         boolean quickStackEnabled,
         boolean petsEnabled,
@@ -23,6 +25,8 @@ public record Settings(
         return new Settings(
                 config.getBoolean("features.homes", true),
                 config.getBoolean("features.graves", true),
+                config.getBoolean("features.holograms", true),
+                config.getBoolean("features.damage-holograms", true),
                 config.getBoolean("features.chest-sort", true),
                 config.getBoolean("features.quick-stack", true),
                 config.getBoolean("features.pets", true),
