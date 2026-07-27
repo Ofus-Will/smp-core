@@ -3,6 +3,7 @@ features:
   graves: true
   holograms: true
   damage-holograms: true
+  double-doors: true
   chest-sort: true
   quick-stack: true
   pets: true

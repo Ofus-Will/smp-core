@@ -8,6 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.ofus.core.feature.PluginFeature;
 import org.ofus.core.feature.chestsort.ChestSortFeature;
 import org.ofus.core.feature.damage.DamageHologramListener;
+import org.ofus.core.feature.door.DoubleDoorListener;
 import org.ofus.core.feature.grave.GraveFeature;
 import org.ofus.core.feature.hologram.HologramFeature;
 import org.ofus.core.feature.home.HomeFeature;
@@ -32,6 +33,7 @@ public class Core extends JavaPlugin {
     private final List<RootCommand> commands = new ArrayList<>();
 
     private DamageHologramListener damageHologramListener;
+    private DoubleDoorListener doubleDoorListener;
 
     @Override
     public void onEnable() {
@@ -59,6 +61,7 @@ public class Core extends JavaPlugin {
         if (settings.gravesEnabled()) features.add(new GraveFeature(this));
         if (settings.hologramsEnabled()) features.add(new HologramFeature(this));
         if (settings.damageHologramsEnabled()) damageHologramListener = new DamageHologramListener(this);
+        if (settings.doubleDoorsEnabled()) doubleDoorListener = new DoubleDoorListener();
         if (settings.chestSortEnabled()) features.add(new ChestSortFeature());
         if (settings.quickStackEnabled()) commands.add(new QuickStackCommand(settings.quickStackRadius()));
         if (settings.petsEnabled()) features.add(new PetsFeature(this, settings));
@@ -77,6 +80,7 @@ public class Core extends JavaPlugin {
     private void registerListeners() {
         registerListenerBatch(new GUIListener());
         if (damageHologramListener != null) registerListenerBatch(damageHologramListener);
+        if (doubleDoorListener != null) registerListenerBatch(doubleDoorListener);
 
         for (PluginFeature feature : features) {
             registerListenerBatch(feature.listeners().toArray(Listener[]::new));
