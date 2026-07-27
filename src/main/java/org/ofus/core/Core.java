@@ -11,10 +11,11 @@ import org.ofus.core.feature.grave.GraveFeature;
 import org.ofus.core.feature.home.HomeFeature;
 import org.ofus.core.feature.item.LoreCommand;
 import org.ofus.core.feature.item.RenameCommand;
-import org.ofus.core.feature.pets.PetsCommand;
+import org.ofus.core.feature.pets.PetsFeature;
 import org.ofus.core.feature.player.CreativeCommand;
 import org.ofus.core.feature.player.SurvivalCommand;
 import org.ofus.core.feature.quickstack.QuickStackCommand;
+import org.ofus.core.feature.recipe.RecipeFeature;
 import org.ofus.core.feature.world.SpawnCommand;
 import org.ofus.core.feature.world.WorldCommand;
 import org.ofus.core.util.command.RootCommand;
@@ -53,7 +54,8 @@ public class Core extends JavaPlugin {
         if (settings.gravesEnabled()) features.add(new GraveFeature(this));
         if (settings.chestSortEnabled()) features.add(new ChestSortFeature());
         if (settings.quickStackEnabled()) commands.add(new QuickStackCommand(settings.quickStackRadius()));
-        if (settings.petsEnabled()) commands.add(new PetsCommand());
+        if (settings.petsEnabled()) features.add(new PetsFeature(this));
+        if (settings.recipesEnabled()) features.add(new RecipeFeature(this));
 
         commands.addAll(List.of(
             new RenameCommand(settings.maxRenameLength()),

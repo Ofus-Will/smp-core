@@ -4,6 +4,7 @@ features:
   chest-sort: true
   quick-stack: true
   pets: true
+  recipes: true
 
 homes:
   max: 5

@@ -14,8 +14,10 @@ public final class PetFinder {
     }
 
     public static List<Tameable> findPets(Player player) {
-        UUID owner = player.getUniqueId();
+        return findPets(player.getUniqueId());
+    }
 
+    public static List<Tameable> findPets(UUID owner) {
         return Bukkit.getWorlds().stream()
                 .flatMap(world -> world.getEntitiesByClass(Tameable.class).stream())
                 .filter(Tameable::isTamed)
