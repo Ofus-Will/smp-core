@@ -45,7 +45,6 @@ public class GraveGUI extends GUI {
             Texts.send(player, "&cThis is not your grave.");
             return;
         }
-
         super.open(player);
     }
 

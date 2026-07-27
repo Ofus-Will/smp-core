@@ -50,32 +50,27 @@ public final class ItemBuilder {
                 .toList());
     }
 
-    // amount
     public ItemBuilder amount(int amount) {
         item.setAmount(amount);
         return this;
     }
 
-    // glow
     public ItemBuilder glow() {
         meta.addEnchant(Enchantment.UNBREAKING, 1, true);
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         return this;
     }
 
-    // enchant
     public ItemBuilder enchant(Enchantment enchantment, int level) {
         meta.addEnchant(enchantment, level, true);
         return this;
     }
 
-    // flag
     public ItemBuilder flag(ItemFlag... flags) {
         meta.addItemFlags(flags);
         return this;
     }
 
-    // unbreakable
     public ItemBuilder unbreakable() {
         meta.setUnbreakable(true);
         return this;

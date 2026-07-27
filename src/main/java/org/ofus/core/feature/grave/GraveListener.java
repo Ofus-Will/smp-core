@@ -32,7 +32,7 @@ public class GraveListener implements Listener {
 
         while (!block.getType().isAir() || manager.has(block.getLocation())) {
             if (block.getY() >= block.getWorld().getMaxHeight() - 1) {
-                Texts.send(player, "&cNo space was found for your grave.");
+                Texts.send(player, "&cNo space was found for your grave");
                 return;
             }
 

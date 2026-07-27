@@ -27,10 +27,7 @@ public class GraveManager {
 
         for (GraveData data : repository.getAll()) {
             Block block = data.location().getBlock();
-
-            if (block.getType() != Material.PLAYER_HEAD) {
-                block.setType(Material.PLAYER_HEAD);
-            }
+            block.setType(Material.PLAYER_HEAD);
 
             GraveGUI grave = new GraveGUI(
                     data.id(),

@@ -5,37 +5,36 @@ import org.bukkit.event.Listener;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.ofus.core.feature.PluginFeature;
+import org.ofus.core.feature.chestsort.ChestSortFeature;
+import org.ofus.core.feature.grave.GraveFeature;
+import org.ofus.core.feature.home.HomeFeature;
 import org.ofus.core.feature.item.LoreCommand;
 import org.ofus.core.feature.item.RenameCommand;
+import org.ofus.core.feature.pets.PetsCommand;
 import org.ofus.core.feature.player.CreativeCommand;
 import org.ofus.core.feature.player.SurvivalCommand;
 import org.ofus.core.feature.quickstack.QuickStackCommand;
-import org.ofus.core.feature.chestsort.ChestSortListener;
-import org.ofus.core.feature.grave.GraveListener;
-import org.ofus.core.feature.grave.GraveManager;
-import org.ofus.core.feature.grave.GraveRepository;
-import org.ofus.core.feature.home.*;
-import org.ofus.core.feature.pets.PetsCommand;
-import org.ofus.core.util.command.RootCommand;
-import org.ofus.core.util.gui.GUIListener;
 import org.ofus.core.feature.world.SpawnCommand;
 import org.ofus.core.feature.world.WorldCommand;
+import org.ofus.core.util.command.RootCommand;
+import org.ofus.core.util.gui.GUIListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Core extends JavaPlugin {
 
-    private Settings settings;
-    private HomeManager homeManager;
-    private GraveManager graveManager;
+    private final List<PluginFeature> features = new ArrayList<>();
+    private final List<RootCommand> commands = new ArrayList<>();
 
     @Override
     public void onEnable() {
-
         getLogger().info("Plugin enabled!");
 
-        createManagers();
+        createFeatures();
+        features.forEach(PluginFeature::enable);
+
         registerListeners();
         registerCommands();
     }
@@ -44,36 +43,47 @@ public class Core extends JavaPlugin {
     public void onDisable() {
         getLogger().info("Plugin disabled!");
 
-        if (graveManager != null) graveManager.saveAll();
+        features.forEach(PluginFeature::disable);
     }
 
-    private void createManagers() {
-        settings = Settings.load(this);
+    private void createFeatures() {
+        Settings settings = Settings.load(this);
 
-        if (settings.homesEnabled()) {
-            HomesRepository homesRepository = new HomesRepository(this);
-            homeManager = new HomeManager(
-                    homesRepository,
-                    settings.maxHomes()
-            );
-        }
+        if (settings.homesEnabled()) features.add(new HomeFeature(this, settings));
+        if (settings.gravesEnabled()) features.add(new GraveFeature(this));
+        if (settings.chestSortEnabled()) features.add(new ChestSortFeature());
+        if (settings.quickStackEnabled()) commands.add(new QuickStackCommand(settings.quickStackRadius()));
+        if (settings.petsEnabled()) commands.add(new PetsCommand());
 
-        if (settings.gravesEnabled()) {
-            GraveRepository graveRepository = new GraveRepository(this);
-            graveManager = new GraveManager(graveRepository);
-            graveManager.load();
-        }
+        commands.addAll(List.of(
+            new RenameCommand(settings.maxRenameLength()),
+            new LoreCommand(settings.maxLoreLineLength()),
+            new WorldCommand(),
+            new SpawnCommand(),
+            new CreativeCommand(),
+            new SurvivalCommand()
+        ));
     }
 
     private void registerListeners() {
-        List<Listener> listeners = new ArrayList<>();
+        registerListenerBatch(new GUIListener());
 
-        listeners.add(new GUIListener());
-        if (homeManager != null) listeners.add(new HomeListener(homeManager));
-        if (settings.chestSortEnabled()) listeners.add(new ChestSortListener());
-        if (graveManager != null) listeners.add(new GraveListener(graveManager));
+        for (PluginFeature feature : features) {
+            registerListenerBatch(feature.listeners().toArray(Listener[]::new));
+        }
+    }
 
-        registerListenerBatch(listeners.toArray(Listener[]::new));
+    private void registerCommands() {
+        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS,
+            event -> {
+                List<RootCommand> registeredCommands = new ArrayList<>(commands);
+
+                for (PluginFeature feature : features) {
+                    registeredCommands.addAll(feature.commands());
+                }
+
+                registerCommandBatch(event.registrar(), registeredCommands.toArray(RootCommand[]::new));
+            });
     }
 
     private void registerPermission(String node, PermissionDefault defaultValue) {
@@ -95,38 +105,6 @@ public class Core extends JavaPlugin {
         registrar.register(command.getName(), command.getDescription(), command.getAliases(), command);
     }
 
-    private void registerCommands() {
-        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS,
-                event -> {
-                    List<RootCommand> commands = new ArrayList<>();
-
-                    if (homeManager != null) {
-                        commands.add(new HomeCommand(homeManager));
-                        commands.add(new SetHomeCommand(homeManager));
-                        commands.add(new DeleteHomeCommand(homeManager));
-                    }
-
-                    commands.addAll(List.of(
-                        new RenameCommand(settings.maxRenameLength()),
-                        new LoreCommand(settings.maxLoreLineLength()),
-                        new WorldCommand(),
-                        new SpawnCommand(),
-                        new CreativeCommand(),
-                        new SurvivalCommand()
-                    ));
-
-                    if (settings.quickStackEnabled()) {
-                        commands.add(new QuickStackCommand(settings.quickStackRadius()));
-                    }
-
-                    if (settings.petsEnabled()) {
-                        commands.add(new PetsCommand());
-                    }
-
-                    registerCommandBatch(event.registrar(), commands.toArray(RootCommand[]::new));
-                });
-    }
-
     private void registerCommandBatch(io.papermc.paper.command.brigadier.Commands registrar, RootCommand... commands) {
         for (RootCommand command : commands) {
             registerCommand(registrar, command);
@@ -138,5 +116,4 @@ public class Core extends JavaPlugin {
             getServer().getPluginManager().registerEvents(listener, this);
         }
     }
-
 }
