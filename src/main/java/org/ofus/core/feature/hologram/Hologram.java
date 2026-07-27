@@ -2,8 +2,12 @@ package org.ofus.core.feature.hologram;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.TextDisplay;
+import org.bukkit.util.Transformation;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
 import org.ofus.core.util.Texts;
 
 import java.util.ArrayList;
@@ -18,6 +22,8 @@ public class Hologram {
 
     private List<String> lines;
     private Location loc;
+    private Entity mount;
+    private double mountOffset;
 
     public Hologram(Location loc, String... lines) {
         this(null, loc, lines);
@@ -58,7 +64,14 @@ public class Hologram {
 
     private void positionDisplays() {
         for (int i = 0; i < displays.size(); i++) {
-            displays.get(i).teleport(getLineLocation(i));
+            TextDisplay display = displays.get(i);
+
+            if (mount != null) {
+                mountDisplay(display, i);
+                continue;
+            }
+
+            display.teleport(getLineLocation(i));
         }
     }
 
@@ -71,7 +84,21 @@ public class Hologram {
         TextDisplay display = (TextDisplay) location.getWorld().spawnEntity(location, EntityType.TEXT_DISPLAY);
         style(display);
 
+        if (mount != null) mountDisplay(display, index);
         return display;
+    }
+
+    private void mountDisplay(TextDisplay display, int index) {
+        display.setTransformation(new Transformation(
+                new Vector3f(0, (float) (mountOffset - index * LINE_SPACING), 0),
+                new AxisAngle4f(),
+                new Vector3f(1, 1, 1),
+                new AxisAngle4f()
+        ));
+
+        if (!mount.getPassengers().contains(display)) {
+            mount.addPassenger(display);
+        }
     }
 
     private static void style(TextDisplay display) {
@@ -84,6 +111,14 @@ public class Hologram {
 
     public void teleport(Location loc) {
         this.loc = loc.clone();
+        this.mount = null;
+        positionDisplays();
+    }
+
+    public void mount(Entity entity, double offset) {
+        this.loc = entity.getLocation();
+        this.mount = entity;
+        this.mountOffset = offset;
         positionDisplays();
     }
 

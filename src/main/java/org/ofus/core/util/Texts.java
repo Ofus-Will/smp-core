@@ -18,4 +18,8 @@ public final class Texts {
     public static void send(Audience audience, String text) {
         audience.sendMessage(parse(text));
     }
+
+    public static void actionBar(Audience audience, String text) {
+        audience.sendActionBar(parse(text));
+    }
 }

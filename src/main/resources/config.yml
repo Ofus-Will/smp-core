@@ -14,6 +14,11 @@ homes:
 quick-stack:
   radius: 5
 
+pets:
+  auto-attack-radius: 12
+  hologram-radius: 32
+  heal-on-kill: 4.0
+
 items:
   max-rename-length: 64
   max-lore-line-length: 128

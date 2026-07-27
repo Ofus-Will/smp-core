@@ -5,6 +5,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Tameable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -37,7 +38,7 @@ public class DamageHologramListener implements Listener {
     public void onDamage(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof LivingEntity damaged)) return;
 //        if (damaged instanceof Player) return;
-        if (getAttackingPlayer(event.getDamager()) == null) return;
+        if (!isHologramDamageCause(event.getDamager())) return;
         if (event.getFinalDamage() <= 0) return;
 
         Location location = getDisplayLocation(damaged);
@@ -82,14 +83,18 @@ public class DamageHologramListener implements Listener {
         );
     }
 
-    private Player getAttackingPlayer(Entity damager) {
-        if (damager instanceof Player player) return player;
+    private boolean isHologramDamageCause(Entity damager) {
+        if (damager instanceof Player) return true;
+
+        if (damager instanceof Tameable pet) {
+            return pet.isTamed() && pet.getOwnerUniqueId() != null;
+        }
 
         if (damager instanceof Projectile projectile) {
             ProjectileSource shooter = projectile.getShooter();
-            if (shooter instanceof Player player) return player;
+            return shooter instanceof Player;
         }
 
-        return null;
+        return false;
     }
 }

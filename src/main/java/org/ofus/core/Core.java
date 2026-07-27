@@ -61,7 +61,7 @@ public class Core extends JavaPlugin {
         if (settings.damageHologramsEnabled()) damageHologramListener = new DamageHologramListener(this);
         if (settings.chestSortEnabled()) features.add(new ChestSortFeature());
         if (settings.quickStackEnabled()) commands.add(new QuickStackCommand(settings.quickStackRadius()));
-        if (settings.petsEnabled()) features.add(new PetsFeature(this));
+        if (settings.petsEnabled()) features.add(new PetsFeature(this, settings));
         if (settings.recipesEnabled()) features.add(new RecipeFeature(this));
 
         commands.addAll(List.of(
