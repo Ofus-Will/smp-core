@@ -6,6 +6,7 @@ features:
   double-doors: true
   chest-sort: true
   quick-stack: true
+  teleport-requests: true
   pets: true
   recipes: true
 

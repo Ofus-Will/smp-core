@@ -6,6 +6,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.ofus.core.feature.PluginFeature;
+import org.ofus.core.feature.chat.ChatListener;
 import org.ofus.core.feature.chestsort.ChestSortFeature;
 import org.ofus.core.feature.damage.DamageHologramListener;
 import org.ofus.core.feature.door.DoubleDoorListener;
@@ -19,6 +20,7 @@ import org.ofus.core.feature.player.CreativeCommand;
 import org.ofus.core.feature.player.SurvivalCommand;
 import org.ofus.core.feature.quickstack.QuickStackCommand;
 import org.ofus.core.feature.recipe.RecipeFeature;
+import org.ofus.core.feature.teleport.TeleportRequestFeature;
 import org.ofus.core.feature.world.SpawnCommand;
 import org.ofus.core.feature.world.WorldCommand;
 import org.ofus.core.util.command.RootCommand;
@@ -64,6 +66,7 @@ public class Core extends JavaPlugin {
         if (settings.doubleDoorsEnabled()) doubleDoorListener = new DoubleDoorListener();
         if (settings.chestSortEnabled()) features.add(new ChestSortFeature());
         if (settings.quickStackEnabled()) commands.add(new QuickStackCommand(settings.quickStackRadius()));
+        if (settings.teleportRequestsEnabled()) features.add(new TeleportRequestFeature());
         if (settings.petsEnabled()) features.add(new PetsFeature(this, settings));
         if (settings.recipesEnabled()) features.add(new RecipeFeature(this));
 
@@ -79,6 +82,7 @@ public class Core extends JavaPlugin {
 
     private void registerListeners() {
         registerListenerBatch(new GUIListener());
+        registerListenerBatch(new ChatListener());
         if (damageHologramListener != null) registerListenerBatch(damageHologramListener);
         if (doubleDoorListener != null) registerListenerBatch(doubleDoorListener);
 

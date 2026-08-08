@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Tameable;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -77,6 +78,7 @@ public class PetHologramTask {
             world.getEntitiesByClass(Tameable.class).stream()
                     .filter(Tameable::isTamed)
                     .filter(pet -> pet.getOwnerUniqueId() != null)
+                    .filter(pet -> !(pet instanceof AbstractHorse))
                     .forEach(pets::add);
         }
 

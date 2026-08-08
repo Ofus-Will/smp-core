@@ -2,6 +2,7 @@ package org.ofus.core.feature.item;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.permissions.PermissionDefault;
 import org.jetbrains.annotations.NotNull;
 import org.ofus.core.util.command.PlayerCommand;
 import org.ofus.core.util.ItemBuilder;
@@ -14,7 +15,7 @@ public class RenameCommand extends PlayerCommand {
         super("rename");
         this.maxNameLength = maxNameLength;
 
-        permission("core.rename");
+        permission("core.rename", PermissionDefault.OP);
         usage("/rename <name>");
         description("Rename the item in your hand");
     }

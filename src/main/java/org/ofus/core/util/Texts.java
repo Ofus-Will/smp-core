@@ -4,10 +4,13 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public final class Texts {
 
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacyAmpersand();
+
+    private static final PlainTextComponentSerializer PLAIN = PlainTextComponentSerializer.plainText();
 
     private Texts () {}
 
@@ -21,5 +24,9 @@ public final class Texts {
 
     public static void actionBar(Audience audience, String text) {
         audience.sendActionBar(parse(text));
+    }
+
+    public static String plain(Component component) {
+        return PLAIN.serialize(component);
     }
 }
