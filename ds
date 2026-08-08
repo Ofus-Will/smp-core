@@ -1,0 +1,207 @@
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/README.md b/README.md[m
+[1mindex 5af995b..f605262 100644[m
+[1m--- a/README.md[m
+[1m+++ b/README.md[m
+[36m@@ -1,70 +1,93 @@[m
+ # smp-core[m
+ [m
+[31m-A small core plugin for a Minecraft survival multiplayer server.[m
+[32m+[m[32mA Paper plugin that provides  quality-of-life features for a survival multiplayer server.[m
+ [m
+ ## Features[m
+ [m
+ ### Homes[m
+ [m
+[31m-- `/sethome [name]` saves your current location.[m
+[32m+[m[32m- `/sethome [name]` saves the player's current location.[m
+ - `/home [name]` teleports to a saved home.[m
+[31m-- `/delhome [name]` or `/deletehome [name]` deletes a saved home.[m
+[31m-- Home names are validated and limited by `homes.max`.[m
+[32m+[m[32m- `/home` lists homes when the player has more than one saved home.[m
+[32m+[m[32m- `/delhome [name]` deletes a saved home.[m
+[32m+[m[32m- `/deletehome [name]` is an alias for `/delhome`.[m
+[32m+[m[32m- Home names are validated by the home manager and the maximum number of homes is controlled by `homes.max`.[m
+[32m+[m
+[32m+[m[32m### Teleport Requests[m
+[32m+[m
+[32m+[m[32m- `/tpa <player>` asks to teleport to another online player.[m
+[32m+[m[32m- `/tpaccept` accepts the latest pending request.[m
+[32m+[m[32m- `/tpyes` is an alias for `/tpaccept`.[m
+[32m+[m[32m- `/tpdeny` denies the latest pending request.[m
+[32m+[m[32m- `/tpno` is an alias for `/tpdeny`.[m
+[32m+[m[32m- Requests are only available when `features.teleport-requests` is enabled.[m
+ [m
+ ### Graves[m
+ [m
+[31m-- Creates a grave when a player dies with items or experience.[m
+[31m-- Stores the player's drops and experience in a grave GUI.[m
+[31m-- Only the grave owner can open their grave.[m
+[31m-- When the grave is emptied, the grave block is removed and stored experience is returned.[m
+[32m+[m[32m- Creates a player-head grave when a player dies with drops or experience.[m
+[32m+[m[32m- Stores the player's dropped items and experience in a grave GUI.[m
+[32m+[m[32m- Cancels the normal item and XP drops after the grave is created.[m
+[32m+[m[32m- Only the grave owner can open the grave.[m
+[32m+[m[32m- Right-clicking or attempting to break the grave opens the grave GUI.[m
+[32m+[m[32m- When the grave inventory is emptied, the grave block is removed and stored experience is returned.[m
+[32m+[m[32m- Graves are persisted through the grave repository.[m
+ [m
+ ### Pets[m
+ [m
+[31m-- `/pets` or `/pet` opens a GUI of known pets.[m
+[31m-- Left click a pet to teleport to it.[m
+[31m-- Right click a pet to teleport it to you.[m
+[31m-- Known pets are saved so unloaded pets can be found again once their chunk is loaded.[m
+[31m-- Tamed wolves can automatically target nearby hostile mobs.[m
+[31m-- Pet kills can drop XP like player kills.[m
+[31m-- Pets heal on kill, capped at max health.[m
+[31m-- Pet kills send the owner an action bar message.[m
+[31m-- Loaded tamed pets show mounted holograms with their name and health bar.[m
+[31m-- If a pet has no custom name, its hologram uses the owner fallback, such as `Billy's wolf`.[m
+[32m+[m[32m- `/pets` opens a GUI of known tamed pets.[m
+[32m+[m[32m- `/pet` is an alias for `/pets`.[m
+[32m+[m[32m- Left-click a pet in the GUI to teleport to it.[m
+[32m+[m[32m- Right-click a pet in the GUI to teleport it to you.[m
+[32m+[m[32m- Tamed pets are remembered when chunks load.[m
+[32m+[m[32m- Shift-right-click a horse to inspect health, speed, jump height, and raw stat values.[m
+[32m+[m[32m- Low-health tamed pets teleport back to their owner when they take damage.[m
+[32m+[m[32m- Tamed wolves can automatically target nearby hostile mobs, excluding creepers.[m
+[32m+[m[32m- Pet kills can drop XP like player kills, heal the pet, and show the owner an action bar message.[m
+[32m+[m[32m- Loaded tamed pets can show holograms with name and health information.[m
+ [m
+ ### Holograms[m
+ [m
+[31m-- `/hologram create <id> <lines>` creates a saved text hologram.[m
+[32m+[m[32m- `/hologram create <id> <lines>` creates a saved text hologram at the player's view location.[m
+[32m+[m[32m- `/hologram add <id> <lines>` is an alias for create.[m
+ - `/hologram delete <id>` removes a saved hologram.[m
+[32m+[m[32m- `/hologram remove <id>` is an alias for delete.[m
+ - `/hologram list` lists saved holograms.[m
+[31m-- `/hologram move <id>` moves a hologram to your view position.[m
+[32m+[m[32m- `/hologram move <id>` moves a hologram to the player's view location.[m
+[32m+[m[32m- `/hologram tp <id>` and `/hologram teleport <id>` are aliases for move.[m
+ - `/hologram update <id> <lines>` updates hologram text.[m
+[31m-- Separate lines are split with `//`.[m
+[31m-- Holograms are saved to `holograms.yml`.[m
+[32m+[m[32m- `/hologram edit`, `/hologram setlines`, and `/hologram lines` are aliases for update.[m
+[32m+[m[32m- Separate hologram lines are split with `//`.[m
+[32m+[m[32m- Holograms are saved by the hologram repository.[m
+ [m
+ ### Damage Holograms[m
+ [m
+ - Shows temporary floating damage numbers when players or tamed pets damage entities.[m
+ - Damage text rises, fades out, and removes itself automatically.[m
+[32m+[m[32m- Controlled by `features.damage-holograms`.[m
+ [m
+ ### Inventory Helpers[m
+ [m
+[31m-- `/quickstack` or `/qs` moves matching inventory items into nearby chests.[m
+[31m-- Chest sorting lets players sort chest contents through the chest interaction feature.[m
+[32m+[m[32m- `/quickstack` moves matching inventory items into nearby chests.[m
+[32m+[m[32m- `/qs` is an alias for `/quickstack`.[m
+[32m+[m[32m- Quick stack only moves items into chests that already contain a similar item.[m
+[32m+[m[32m- Nearby chests are searched within `quick-stack.radius`.[m
+[32m+[m[32m- Sneak-left-clicking a chest sorts its contents by item type.[m
+ [m
+ ### Items[m
+ [m
+[31m-- `/rename <name>` renames the item in your hand.[m
+[31m-- `/lore clear` clears item lore.[m
+[31m-- `/lore setline <line> <text>` sets a lore line.[m
+[32m+[m[32m- `/rename <name>` renames the item in the player's main hand.[m
+[32m+[m[32m- `/lore clear` clears lore on the item in the player's main hand.[m
+[32m+[m[32m- `/lore setline <line> <text>` sets a lore line, with line numbers starting at 1.[m
+ - `/lore removeline <line>` removes a lore line.[m
+[32m+[m[32m- Rename and lore text lengths are limited by the `items` config values.[m
+ [m
+ ### World And Player Commands[m
+ [m
+ - `/spawn` teleports to the current world's spawn.[m
+[31m-- `/world` lists worlds.[m
+[31m-- `/world <world>` teleports to a world spawn.[m
+[31m-- `/gmc` switches to creative mode.[m
+[31m-- `/gms` switches to survival mode.[m
+[32m+[m[32m- `/world` lists loaded worlds.[m
+[32m+[m[32m- `/world <world>` teleports to that world's spawn.[m
+[32m+[m[32m- `/gmc` switches the player to creative mode.[m
+[32m+[m[32m- `/gms` switches the player to survival mode.[m
+ [m
+ ### Double Doors[m
+ [m
+[36m@@ -74,10 +97,14 @@[m [mA small core plugin for a Minecraft survival multiplayer server.[m
+ [m
+ ### Recipes[m
+ [m
+[31m-- Includes a recipe feature area for adding custom crafting and furnace recipes.[m
+[32m+[m[32m- Registers custom recipes when `features.recipes` is enabled.[m
+[32m+[m[32m- Current furnace recipe: rotten flesh smelts into leather.[m
+[32m+[m[32m- The crafting recipe feature is present but currently registers no custom crafting recipes.[m
+ [m
+ ## Configuration[m
+ [m
+[32m+[m[32mDefault `config.yml`:[m
+[32m+[m
+ ```yaml[m
+ features:[m
+   homes: true[m
+[36m@@ -87,6 +114,7 @@[m [mfeatures:[m
+   double-doors: true[m
+   chest-sort: true[m
+   quick-stack: true[m
+[32m+[m[32m  teleport-requests: true[m
+   pets: true[m
+   recipes: true[m
+ [m
+[36m@@ -106,32 +134,33 @@[m [mitems:[m
+   max-lore-line-length: 128[m
+ ```[m
+ [m
+[32m+[m[32mNotes:[m
+[32m+[m
+[32m+[m[32m- Numeric config values are clamped to safe minimums in `Settings`.[m
+[32m+[m[32m- Feature flags are read on plugin startup.[m
+[32m+[m[32m- Disable a feature by setting its `features.<name>` value to `false`.[m
+[32m+[m
+ ## Permissions[m
+ [m
+[31m-| Permission | Default | Description |[m
+[32m+[m[32m| Permission | Default | Covers |[m
+ | --- | --- | --- |[m
+[31m-| `core.homes` | Everyone | Use `/home`, `/sethome`, and `/delhome`. |[m
+[31m-| `core.quickstack` | Everyone | Use `/quickstack` and `/qs`. |[m
+[31m-| `core.pets` | Everyone | Use `/pets` and `/pet`. |[m
+[31m-| `core.spawn` | Everyone | Use `/spawn`. |[m
+[31m-| `core.rename` | Configured by command registration | Use `/rename`. |[m
+[31m-| `core.lore` | OP | Use `/lore`. |[m
+[31m-| `core.holograms` | OP | Manage holograms. |[m
+[31m-| `core.world` | OP | Use `/world`. |[m
+[31m-| `core.gamemode` | OP | Use `/gmc` and `/gms`. |[m
+[32m+[m[32m| `core.homes` | Everyone | `/home`, `/sethome`, `/delhome`, `/deletehome` |[m
+[32m+[m[32m| `core.tpa` | Everyone | `/tpa`, `/tpaccept`, `/tpyes`, `/tpdeny`, `/tpno` |[m
+[32m+[m[32m| `core.quickstack` | Everyone | `/quickstack`, `/qs` |[m
+[32m+[m[32m| `core.pets` | Everyone | `/pets`, `/pet` |[m
+[32m+[m[32m| `core.spawn` | Everyone | `/spawn` |[m
+[32m+[m[32m| `core.rename` | OP | `/rename` |[m
+[32m+[m[32m| `core.lore` | OP | `/lore` |[m
+[32m+[m[32m| `core.holograms` | OP | `/hologram`, `/holograms` |[m
+[32m+[m[32m| `core.world` | OP | `/world` |[m
+[32m+[m[32m| `core.gamemode` | OP | `/gmc`, `/gms` |[m
+ [m
+ ## Building[m
+ [m
+[31m-Build the plugin jar with Gradle:[m
+[31m-[m
+[31m-```powershell[m
+[31m-.\gradlew.bat jar[m
+[31m-```[m
+[31m-[m
+[31m-The jar is named `Core.jar`.[m
+[32m+[m[32mIf `gradle.properties` contains `targetDirectory`, the `jar` task writes directly to that folder.[m
+ [m
+[31m-If `gradle.properties` contains `targetDirectory`, the jar task writes directly to that folder. Example:[m
+[32m+[m[32mExample:[m
+ [m
+ ```properties[m
+[31m-targetDirectory=C:\\Users\\billy\\Desktop\\Minecraft\\Lucie SMP\\plugins[m
+[32m+[m[32mtargetDirectory=C:\\Users\\john\\Desktop\\Minecraft\\SMP\\plugins[m
+ ```[m

@@ -1,70 +1,93 @@
 # smp-core
 
-A small core plugin for a Minecraft survival multiplayer server.
+A Paper plugin that provides  quality-of-life features for a survival multiplayer server.
 
 ## Features
 
 ### Homes
 
-- `/sethome [name]` saves your current location.
+- `/sethome [name]` saves the player's current location.
 - `/home [name]` teleports to a saved home.
-- `/delhome [name]` or `/deletehome [name]` deletes a saved home.
-- Home names are validated and limited by `homes.max`.
+- `/home` lists homes when the player has more than one saved home.
+- `/delhome [name]` deletes a saved home.
+- `/deletehome [name]` is an alias for `/delhome`.
+- Home names are validated by the home manager and the maximum number of homes is controlled by `homes.max`.
+
+### Teleport Requests
+
+- `/tpa <player>` asks to teleport to another online player.
+- `/tpaccept` accepts the latest pending request.
+- `/tpyes` is an alias for `/tpaccept`.
+- `/tpdeny` denies the latest pending request.
+- `/tpno` is an alias for `/tpdeny`.
+- Requests are only available when `features.teleport-requests` is enabled.
 
 ### Graves
 
-- Creates a grave when a player dies with items or experience.
-- Stores the player's drops and experience in a grave GUI.
-- Only the grave owner can open their grave.
-- When the grave is emptied, the grave block is removed and stored experience is returned.
+- Creates a player-head grave when a player dies with drops or experience.
+- Stores the player's dropped items and experience in a grave GUI.
+- Cancels the normal item and XP drops after the grave is created.
+- Only the grave owner can open the grave.
+- Right-clicking or attempting to break the grave opens the grave GUI.
+- When the grave inventory is emptied, the grave block is removed and stored experience is returned.
+- Graves are persisted through the grave repository.
 
 ### Pets
 
-- `/pets` or `/pet` opens a GUI of known pets.
-- Left click a pet to teleport to it.
-- Right click a pet to teleport it to you.
-- Known pets are saved so unloaded pets can be found again once their chunk is loaded.
-- Tamed wolves can automatically target nearby hostile mobs.
-- Pet kills can drop XP like player kills.
-- Pets heal on kill, capped at max health.
-- Pet kills send the owner an action bar message.
-- Loaded tamed pets show mounted holograms with their name and health bar.
-- If a pet has no custom name, its hologram uses the owner fallback, such as `Billy's wolf`.
+- `/pets` opens a GUI of known tamed pets.
+- `/pet` is an alias for `/pets`.
+- Left-click a pet in the GUI to teleport to it.
+- Right-click a pet in the GUI to teleport it to you.
+- Tamed pets are remembered when chunks load.
+- Shift-right-click a horse to inspect health, speed, jump height, and raw stat values.
+- Low-health tamed pets teleport back to their owner when they take damage.
+- Tamed wolves can automatically target nearby hostile mobs, excluding creepers.
+- Pet kills can drop XP like player kills, heal the pet, and show the owner an action bar message.
+- Loaded tamed pets can show holograms with name and health information.
 
 ### Holograms
 
-- `/hologram create <id> <lines>` creates a saved text hologram.
+- `/hologram create <id> <lines>` creates a saved text hologram at the player's view location.
+- `/hologram add <id> <lines>` is an alias for create.
 - `/hologram delete <id>` removes a saved hologram.
+- `/hologram remove <id>` is an alias for delete.
 - `/hologram list` lists saved holograms.
-- `/hologram move <id>` moves a hologram to your view position.
+- `/hologram move <id>` moves a hologram to the player's view location.
+- `/hologram tp <id>` and `/hologram teleport <id>` are aliases for move.
 - `/hologram update <id> <lines>` updates hologram text.
-- Separate lines are split with `//`.
-- Holograms are saved to `holograms.yml`.
+- `/hologram edit`, `/hologram setlines`, and `/hologram lines` are aliases for update.
+- Separate hologram lines are split with `//`.
+- Holograms are saved by the hologram repository.
 
 ### Damage Holograms
 
 - Shows temporary floating damage numbers when players or tamed pets damage entities.
 - Damage text rises, fades out, and removes itself automatically.
+- Controlled by `features.damage-holograms`.
 
 ### Inventory Helpers
 
-- `/quickstack` or `/qs` moves matching inventory items into nearby chests.
-- Chest sorting lets players sort chest contents through the chest interaction feature.
+- `/quickstack` moves matching inventory items into nearby chests.
+- `/qs` is an alias for `/quickstack`.
+- Quick stack only moves items into chests that already contain a similar item.
+- Nearby chests are searched within `quick-stack.radius`.
+- Sneak-left-clicking a chest sorts its contents by item type.
 
 ### Items
 
-- `/rename <name>` renames the item in your hand.
-- `/lore clear` clears item lore.
-- `/lore setline <line> <text>` sets a lore line.
+- `/rename <name>` renames the item in the player's main hand.
+- `/lore clear` clears lore on the item in the player's main hand.
+- `/lore setline <line> <text>` sets a lore line, with line numbers starting at 1.
 - `/lore removeline <line>` removes a lore line.
+- Rename and lore text lengths are limited by the `items` config values.
 
 ### World And Player Commands
 
 - `/spawn` teleports to the current world's spawn.
-- `/world` lists worlds.
-- `/world <world>` teleports to a world spawn.
-- `/gmc` switches to creative mode.
-- `/gms` switches to survival mode.
+- `/world` lists loaded worlds.
+- `/world <world>` teleports to that world's spawn.
+- `/gmc` switches the player to creative mode.
+- `/gms` switches the player to survival mode.
 
 ### Double Doors
 
@@ -74,9 +97,13 @@ A small core plugin for a Minecraft survival multiplayer server.
 
 ### Recipes
 
-- Includes a recipe feature area for adding custom crafting and furnace recipes.
+- Registers custom recipes when `features.recipes` is enabled.
+- Current furnace recipe: rotten flesh smelts into leather.
+- The crafting recipe feature is present but currently registers no custom crafting recipes.
 
 ## Configuration
+
+Default `config.yml`:
 
 ```yaml
 features:
@@ -87,6 +114,7 @@ features:
   double-doors: true
   chest-sort: true
   quick-stack: true
+  teleport-requests: true
   pets: true
   recipes: true
 
@@ -106,32 +134,33 @@ items:
   max-lore-line-length: 128
 ```
 
+Notes:
+
+- Numeric config values are clamped to safe minimums in `Settings`.
+- Feature flags are read on plugin startup.
+- Disable a feature by setting its `features.<name>` value to `false`.
+
 ## Permissions
 
-| Permission | Default | Description |
+| Permission | Default | Covers |
 | --- | --- | --- |
-| `core.homes` | Everyone | Use `/home`, `/sethome`, and `/delhome`. |
-| `core.quickstack` | Everyone | Use `/quickstack` and `/qs`. |
-| `core.pets` | Everyone | Use `/pets` and `/pet`. |
-| `core.spawn` | Everyone | Use `/spawn`. |
-| `core.rename` | Configured by command registration | Use `/rename`. |
-| `core.lore` | OP | Use `/lore`. |
-| `core.holograms` | OP | Manage holograms. |
-| `core.world` | OP | Use `/world`. |
-| `core.gamemode` | OP | Use `/gmc` and `/gms`. |
+| `core.homes` | Everyone | `/home`, `/sethome`, `/delhome`, `/deletehome` |
+| `core.tpa` | Everyone | `/tpa`, `/tpaccept`, `/tpyes`, `/tpdeny`, `/tpno` |
+| `core.quickstack` | Everyone | `/quickstack`, `/qs` |
+| `core.pets` | Everyone | `/pets`, `/pet` |
+| `core.spawn` | Everyone | `/spawn` |
+| `core.rename` | OP | `/rename` |
+| `core.lore` | OP | `/lore` |
+| `core.holograms` | OP | `/hologram`, `/holograms` |
+| `core.world` | OP | `/world` |
+| `core.gamemode` | OP | `/gmc`, `/gms` |
 
 ## Building
 
-Build the plugin jar with Gradle:
+If `gradle.properties` contains `targetDirectory`, the `jar` task writes directly to that folder.
 
-```powershell
-.\gradlew.bat jar
-```
-
-The jar is named `Core.jar`.
-
-If `gradle.properties` contains `targetDirectory`, the jar task writes directly to that folder. Example:
+Example:
 
 ```properties
-targetDirectory=C:\\Users\\billy\\Desktop\\Minecraft\\Lucie SMP\\plugins
+targetDirectory=C:\\Users\\john\\Desktop\\Minecraft\\SMP\\plugins
 ```
